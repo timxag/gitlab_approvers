@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const { GITLAB_URL, PRIVATE_TOKEN, PROJECT_ID, ELIGIBLE_USERS } = process.env;
 let mrs = [];
-const lastDays = 2;
+const lastDays = 120;
 const eligibleUsers = ELIGIBLE_USERS.split(",");
 
 const getMergeRequests = async (page = 1, mergeRequests = []) => {
@@ -22,9 +22,6 @@ const getMergeRequests = async (page = 1, mergeRequests = []) => {
           updated_after: new Date(
             new Date().setDate(new Date().getDate() - lastDays)
           ).toISOString(),
-          //   updated_after: new Date(
-          //     new Date().setMonth(new Date().getWeek() - 1)
-          //   ).toISOString(),
         },
       }
     );
@@ -149,7 +146,12 @@ const main = async () => {
 
     console.log("Количество аппрувов для каждого пользователя:");
     for (const user in approvalCounts) {
-      console.log(`${user}: ${approvalCounts[user]}`);
+      console.log(
+        `${user}: ${approvalCounts[user]}, ${(
+          (approvalCounts[user] / mergeRequests.length) *
+          100
+        ).toFixed(2)}%`
+      );
     }
   } else {
     console.log("Не удалось получить Merge Requests.");
